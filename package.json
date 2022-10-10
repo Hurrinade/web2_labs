@@ -4,7 +4,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon run",
+    "build": "npm run clean; tsc",
+    "start": "node app.js",
+    "clean": "rm -rf dist",
+    "dev": "nodemon run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "marko.uremovic00@gmail.com",
@@ -12,11 +15,13 @@
   "dependencies": {
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-openid-connect": "^2.8.0",
+    "https": "^1.0.0",
     "pg": "^8.8.0",
     "tsc": "^2.0.4"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20",
-    "@types/pg": "^8.6.5"
+    "@types/pg": "^8.6.5",
+    "nodemon": "^2.0.20"
   }
 }
