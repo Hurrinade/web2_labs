@@ -4,9 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "npm run clean; tsc",
-    "start": "node app.js",
+    "build": "npm run clean && tsc",
     "clean": "rm -rf dist",
+    "start": "node app.js",
     "dev": "nodemon run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,7 +18,8 @@
     "express-openid-connect": "^2.8.0",
     "https": "^1.0.0",
     "pg": "^8.8.0",
-    "tsc": "^2.0.4"
+    "tsc": "^2.0.4",
+    "typescript": "^4.8.4"
   },
   "devDependencies": {
     "@types/pg": "^8.6.5",
