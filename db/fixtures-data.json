@@ -1,0 +1,38 @@
+[
+    {
+        "fixtureId": 1,
+        "firstTeamId": 5,
+        "secondTeamId": 4,
+        "fixtureDate": "28-07-2022"
+    },
+    {
+        "fixtureId": 2,
+        "firstTeamId": 1,
+        "secondTeamId": 6,
+        "fixtureDate": "28-07-2022"
+    },
+    {
+        "fixtureId": 3,
+        "firstTeamId": 3,
+        "secondTeamId": 2,
+        "fixtureDate": "28-07-2022"
+    },
+    {
+        "fixtureId": 1,
+        "firstTeamId": 1,
+        "secondTeamId": 4,
+        "fixtureDate": "02-08-2022"
+    },
+    {
+        "fixtureId": 2,
+        "firstTeamId": 3,
+        "secondTeamId": 5,
+        "fixtureDate": "02-08-2022"
+    },
+    {
+        "fixtureId": 3,
+        "firstTeamId": 2,
+        "secondTeamId": 6,
+        "fixtureDate": "02-08-2022"
+    }
+]

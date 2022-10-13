@@ -2,10 +2,16 @@ const express = require('express')
 const path = require('path')
 const dotenv = require('dotenv')
 const fs = require('fs')
+var cors = require('cors')
 const https = require('https')
 const { auth, requiresAuth } = require('express-openid-connect');
+var bodyParser = require('body-parser')
 
 dotenv.config()
+
+//Routes
+const matches = require('./api/fetchData')
+const authenticate = require('./api/authenticate')
 
 const externalUrl = process.env.RENDER_EXTERNAL_URL;
 const port = externalUrl && process.env.PORT ? parseInt(process.env.PORT) : 4080
@@ -27,6 +33,16 @@ const config = {
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(auth(config))
+app.use(cors())
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
+app.use('/data', matches);
+app.use('/authenticate', authenticate)
 
 app.get("/sign-up", (req, res) => {
     res.oidc.login({

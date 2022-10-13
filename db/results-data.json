@@ -1,0 +1,44 @@
+[
+    {
+        "resultId": 1,
+        "firstTeamId": 4,
+        "secondTeamId": 2,
+        "firstTeamScore": 5,
+        "secondTeamScore": 2
+    },
+    {
+        "resultId": 2,
+        "firstTeamId": 3,
+        "secondTeamId": 4,
+        "firstTeamScore": 1,
+        "secondTeamScore": 2
+    },
+    {
+        "resultId": 3,
+        "firstTeamId": 3,
+        "secondTeamId": 6,
+        "firstTeamScore": 1,
+        "secondTeamScore": 1
+    },
+    {
+        "resultId": 4,
+        "firstTeamId": 2,
+        "secondTeamId": 1,
+        "firstTeamScore": 4,
+        "secondTeamScore": 0
+    },
+    {
+        "resultId": 5,
+        "firstTeamId": 6,
+        "secondTeamId": 5,
+        "firstTeamScore": 3,
+        "secondTeamScore": 1
+    },
+    {
+        "resultId": 6,
+        "firstTeamId": 5,
+        "secondTeamId": 1,
+        "firstTeamScore": 2,
+        "secondTeamScore": 2
+    }
+]
