@@ -6,8 +6,28 @@ const table = require('../db/table-data.json')
 const fixtures = require('../db/fixtures-data.json')
 const comments = require('../db/comments-data.json')
 
-router.get('/', (req, res) => {
+const { expressjwt: jwt } = require("express-jwt");
+const jwksRsa = require("jwks-rsa");
 
+const authConfig = {
+    domain: "dev-djm6hoiw.us.auth0.com",
+    audience: "https://vue-web2-api.com"
+};
+
+
+const checkJwt = jwt({
+    secret: jwksRsa.expressJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`
+    }),
+    audience: authConfig.audience,
+    issuer: `https://${authConfig.domain}/`,
+    algorithms: ["RS256"]
+});
+
+router.get('/', (req, res) => {
     const leagueData = {
         table,
         results,
@@ -17,7 +37,7 @@ router.get('/', (req, res) => {
 })
 
 //secure this
-router.get('/comments', (req, res) => {
+router.get('/comments', checkJwt, (req, res) => {
     // check if user has permision to see comments
     res.json(comments)
 })
