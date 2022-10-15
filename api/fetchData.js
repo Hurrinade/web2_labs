@@ -53,8 +53,20 @@ router.post('/comments', checkJwt, (req, res) => {
 })
 
 router.put('/comments', checkJwt, (req, res) => {
-    const commentId = Number(req.query.id)
-    console.log(commentId, req.body)
+    const editedComment = req.body
+
+    // Test it with email that acctually made comment also add this to delete
+    for (const comment of comments) {
+        if (comment.commentId === Number(editedComment.commentId)
+            && comment.email === editedComment.email
+            && comment.resultId === Number(editedComment.resultId)) {
+            comment.date = editedComment.date;
+            comment.text = editedComment.text;
+        }
+    }
+
+    console.log(editedComment, comments)
+
     res.json(comments)
 })
 
