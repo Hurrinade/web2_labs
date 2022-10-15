@@ -1,17 +1,20 @@
 [
     {
+        "commentId": 1,
         "resultId": 1,
         "email": "fakeemail1234@gmail.com",
         "date": "20-06-2022",
         "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation"
     },
     {
+        "commentId": 2,
         "resultId": 1,
         "email": "fakeemail323312@gmail.com",
         "date": "20-06-2022",
         "text": "Lorem ipsum"
     },
     {
+        "commentId": 3,
         "resultId": 2,
         "email": "dummyemail1234@gmail.com",
         "date": "28-06-2022",

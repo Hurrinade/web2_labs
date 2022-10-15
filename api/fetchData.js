@@ -36,9 +36,41 @@ router.get('/', (req, res) => {
     res.json(leagueData)
 })
 
-//secure this
 router.get('/comments', checkJwt, (req, res) => {
-    // check if user has permision to see comments
+    res.json(comments)
+})
+
+router.post('/comments', checkJwt, (req, res) => {
+    const newComment = req.body;
+
+    comments.sort((a, b) => a.commentId - b.commentId);
+    const lastCommentId = comments[comments.length - 1].commentId
+
+    newComment.commentId = lastCommentId + 1;
+    comments.push(newComment)
+
+    res.json(comments)
+})
+
+router.put('/comments', checkJwt, (req, res) => {
+    const commentId = Number(req.query.id)
+    console.log(commentId, req.body)
+    res.json(comments)
+})
+
+router.delete('/comments', checkJwt, (req, res) => {
+    const commentId = Number(req.query.id)
+
+    comments.sort((a, b) => a.commentId - b.commentId);
+
+    for (const index in comments) {
+        console.log(commentId, comments[index].commentId)
+        if (comments[index].commentId === commentId) {
+            comments.splice(index, 1)
+            break;
+        }
+    }
+
     res.json(comments)
 })
 
