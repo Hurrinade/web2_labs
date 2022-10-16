@@ -30,11 +30,12 @@ const checkJwt = jwt({
     algorithms: ["RS256"]
 });
 
-const checkAdminPermissions = jwtAuthz(['delete:comments', 'edit:result', 'add:result'], { customScopeKey: 'permissions', customUserKey: 'auth' });
+// , customUserKey: 'auth'
+const checkAdminPermissions = jwtAuthz(['delete:comments', 'edit:result', 'add:result'], { customScopeKey: 'permissions' });
 const checkUserPermissions = jwtAuthz([
     "delete:comment",
     "edit:comment"
-], { customScopeKey: 'permissions', customUserKey: 'auth' });
+], { customScopeKey: 'permissions' });
 
 
 router.get('/', (req, res) => {
