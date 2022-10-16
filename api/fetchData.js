@@ -6,14 +6,17 @@ const table = require('../db/table-data.json')
 const fixtures = require('../db/fixtures-data.json')
 const comments = require('../db/comments-data.json')
 
+const axios = require('axios');
+const roles = require('../models/roles')
+
 const { expressjwt: jwt } = require("express-jwt");
 const jwksRsa = require("jwks-rsa");
+const jwtAuthz = require('express-jwt-authz');
 
 const authConfig = {
     domain: "dev-djm6hoiw.us.auth0.com",
     audience: "https://vue-web2-api.com"
 };
-
 
 const checkJwt = jwt({
     secret: jwksRsa.expressJwtSecret({
@@ -27,6 +30,13 @@ const checkJwt = jwt({
     algorithms: ["RS256"]
 });
 
+const checkAdminPermissions = jwtAuthz(['delete:comments', 'edit:result', 'add:result'], { customScopeKey: 'permissions', customUserKey: 'auth' });
+const checkUserPermissions = jwtAuthz([
+    "delete:comment",
+    "edit:comment"
+], { customScopeKey: 'permissions', customUserKey: 'auth' });
+
+
 router.get('/', (req, res) => {
     const leagueData = {
         table,
@@ -36,11 +46,19 @@ router.get('/', (req, res) => {
     res.json(leagueData)
 })
 
+router.get('/role/user', checkJwt, checkUserPermissions, (req, res) => {
+    res.json(roles.User)
+})
+
+router.get('/role/admin', checkJwt, checkAdminPermissions, (req, res) => {
+    res.json(roles.Admin)
+})
+
 router.get('/comments', checkJwt, (req, res) => {
     res.json(comments)
 })
 
-router.post('/comments', checkJwt, (req, res) => {
+router.post('/comments', checkJwt, checkUserPermissions, (req, res) => {
     const newComment = req.body;
 
     comments.sort((a, b) => a.commentId - b.commentId);
@@ -52,8 +70,23 @@ router.post('/comments', checkJwt, (req, res) => {
     res.json(comments)
 })
 
-router.put('/comments', checkJwt, (req, res) => {
+
+// User can edit only his mails
+router.put('/comments', checkJwt, checkUserPermissions, async (req, res) => {
     const editedComment = req.body
+
+    const accessToken = req.headers.authorization.split(" ")[1]
+
+    const userData = await axios.get(`https://${authConfig.domain}/userinfo`, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    })
+
+    if (editedComment.email !== userData.data.email) {
+        res.status(403).json({ error: "You can not change others comments" })
+        return
+    }
 
     // Test it with email that acctually made comment also add this to delete
     for (const comment of comments) {
@@ -62,21 +95,51 @@ router.put('/comments', checkJwt, (req, res) => {
             && comment.resultId === Number(editedComment.resultId)) {
             comment.date = editedComment.date;
             comment.text = editedComment.text;
+            res.json(comments)
+            return;
         }
     }
 
-    console.log(editedComment, comments)
+    res.status(404).json({ error: "This comment not found" })
+
+
+})
+
+// User can delete only his mails
+router.delete('/comments', checkJwt, checkUserPermissions, async (req, res) => {
+    const commentId = Number(req.query.id)
+
+    const accessToken = req.headers.authorization.split(" ")[1]
+
+    const userData = await axios.get(`https://${authConfig.domain}/userinfo`, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    })
+
+    comments.sort((a, b) => a.commentId - b.commentId);
+
+    for (const index in comments) {
+        if (comments[index].commentId === commentId) {
+            if (comments[index].email !== userData.data.email) {
+                res.status(403).json({ error: "You can not delete others comments" })
+                return
+            }
+            comments.splice(index, 1)
+            break;
+        }
+    }
 
     res.json(comments)
 })
 
-router.delete('/comments', checkJwt, (req, res) => {
+// Admin can delete any comment
+router.delete('/comments/any', checkJwt, checkAdminPermissions, (req, res) => {
     const commentId = Number(req.query.id)
 
     comments.sort((a, b) => a.commentId - b.commentId);
 
     for (const index in comments) {
-        console.log(commentId, comments[index].commentId)
         if (comments[index].commentId === commentId) {
             comments.splice(index, 1)
             break;
@@ -84,6 +147,45 @@ router.delete('/comments', checkJwt, (req, res) => {
     }
 
     res.json(comments)
+})
+
+router.post('/results', checkJwt, checkAdminPermissions, (req, res) => {
+    const newResult = req.body
+
+    if (newResult.firstTeamId != null
+        && newResult.secondTeamId != null
+        && newResult.firstTeamScore != null
+        && newResult.secondTeamScore != null
+        && newResult.firstTeamId != newResult.secondTeamId) {
+        results.sort((a, b) => a.resultId - b.resultId);
+        const lastResultId = results[results.length - 1].resultId
+
+        newResult.resultId = lastResultId + 1;
+        results.push(newResult)
+
+        res.json(results)
+    }
+    else {
+        res.json({ error: "All data was not provided or team id's are the same" })
+    }
+})
+
+
+router.put('/results', checkJwt, checkAdminPermissions, (req, res) => {
+    const editedResult = req.body
+
+    // Test it with email that acctually made comment also add this to delete
+    for (const result of results) {
+        if (result.resultId === Number(editedResult.resultId)) {
+            result.firstTeamId = editedResult.firstTeamId;
+            result.secondTeamId = editedResult.secondTeamId;
+            result.firstTeamScore = editedResult.firstTeamScore;
+            result.secondTeamScore = editedResult.secondTeamScore;
+            break;
+        }
+    }
+
+    res.json(results)
 })
 
 module.exports = router
