@@ -30,8 +30,8 @@ const checkJwt = jwt({
     algorithms: ["RS256"]
 });
 
-// , customUserKey: 'auth'
-const checkAdminPermissions = jwtAuthz(['delete:comments', 'edit:result', 'add:result'], { customScopeKey: 'permissions' });
+// , customUserKey: 'auth' LOCAL TESTING
+const checkAdminPermissions = jwtAuthz(['delete:comments', 'edit:result', 'add:result'], { customScopeKey: 'permissions', customUserKey: 'auth' });
 const checkUserPermissions = jwtAuthz([
     "delete:comment",
     "edit:comment"
