@@ -101,7 +101,7 @@ router.put('/comments', checkJwt, checkUserPermissions, async (req, res) => {
         }
     }
 
-    res.status(404).json({ error: "This comment not found" })
+    res.status(404).json({ error: "This comment not found or you are not the person who wrote it" })
 
 
 })
