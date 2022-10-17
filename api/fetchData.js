@@ -35,7 +35,7 @@ const checkAdminPermissions = jwtAuthz(['delete:comments', 'edit:result', 'add:r
 const checkUserPermissions = jwtAuthz([
     "delete:comment",
     "edit:comment"
-], { customScopeKey: 'permissions' });
+], { customScopeKey: 'permissions', customUserKey: 'auth' });
 
 
 router.get('/', (req, res) => {
