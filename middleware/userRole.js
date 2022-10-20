@@ -25,8 +25,6 @@ async function checkUserRole(req, res, next) {
             currentAccessToken = accessToken
         }
 
-        console.log(userData.data)
-
         if (userData != null &&
             userData.data != null &&
             userData.data.email != null
@@ -56,8 +54,6 @@ async function checkAdminRole(req, res, next) {
 
             currentAccessToken = accessToken
         }
-
-        console.log(userData.data)
 
         if (
             userData != null &&
