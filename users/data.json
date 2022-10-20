@@ -1,0 +1,17 @@
+{
+    "userweb2@dispostable.com": {
+        "email": "userWeb2@dispostable.com",
+        "password": "User1234",
+        "role": "USER"
+    },
+    "user2web2@dispostable.com": {
+        "email": "user2Web2@dispostable.com",
+        "password": "User1234",
+        "role": "USER"
+    },
+    "adminweb2@dispostable.com": {
+        "email": "adminWeb2@dispostable.com",
+        "password": "Admin1234",
+        "role": "ADMIN"
+    }
+}

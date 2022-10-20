@@ -9,9 +9,10 @@ const comments = require('../db/comments-data.json')
 const axios = require('axios');
 const roles = require('../models/roles')
 
+const auth = require('../middleware/userRole')
+
 const { expressjwt: jwt } = require("express-jwt");
 const jwksRsa = require("jwks-rsa");
-const jwtAuthz = require('express-jwt-authz');
 
 const authConfig = {
     domain: "dev-djm6hoiw.us.auth0.com",
@@ -31,11 +32,11 @@ const checkJwt = jwt({
 });
 
 // , customUserKey: 'auth' LOCAL TESTING
-const checkAdminPermissions = jwtAuthz(['delete:comments', 'edit:result', 'add:result'], { customScopeKey: 'permissions', customUserKey: 'auth' });
-const checkUserPermissions = jwtAuthz([
-    "delete:comment",
-    "edit:comment"
-], { customScopeKey: 'permissions', customUserKey: 'auth' });
+// const checkAdminPermissions = jwtAuthz(['delete:comments', 'edit:result', 'add:result'], { customScopeKey: 'permissions', customUserKey: 'auth' });
+// const checkUserPermissions = jwtAuthz([
+//     "delete:comment",
+//     "edit:comment"
+// ], { customScopeKey: 'permissions', customUserKey: 'auth' });
 
 
 router.get('/', (req, res) => {
@@ -47,11 +48,12 @@ router.get('/', (req, res) => {
     res.json(leagueData)
 })
 
-router.get('/role/user', checkJwt, checkUserPermissions, (req, res) => {
+// USER
+router.get('/role/user', checkJwt, auth.checkUserRole, (req, res) => {
     res.json(roles.User)
 })
 
-router.get('/role/admin', checkJwt, checkAdminPermissions, (req, res) => {
+router.get('/role/admin', checkJwt, auth.checkAdminRole, (req, res) => {
     res.json(roles.Admin)
 })
 
@@ -59,7 +61,8 @@ router.get('/comments', checkJwt, (req, res) => {
     res.json(comments)
 })
 
-router.post('/comments', checkJwt, checkUserPermissions, (req, res) => {
+// USER
+router.post('/comments', checkJwt, auth.checkUserRole, (req, res) => {
     const newComment = req.body;
 
     comments.sort((a, b) => a.commentId - b.commentId);
@@ -73,18 +76,10 @@ router.post('/comments', checkJwt, checkUserPermissions, (req, res) => {
 
 
 // User can edit only his mails
-router.put('/comments', checkJwt, checkUserPermissions, async (req, res) => {
+router.put('/comments', checkJwt, auth.checkUserRole, async (req, res) => {
     const editedComment = req.body
 
-    const accessToken = req.headers.authorization.split(" ")[1]
-
-    const userData = await axios.get(`https://${authConfig.domain}/userinfo`, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-    })
-
-    if (editedComment.email !== userData.data.email) {
+    if (editedComment.email !== req.email) {
         res.status(403).json({ error: "You can not change others comments" })
         return
     }
@@ -107,22 +102,14 @@ router.put('/comments', checkJwt, checkUserPermissions, async (req, res) => {
 })
 
 // User can delete only his mails
-router.delete('/comments', checkJwt, checkUserPermissions, async (req, res) => {
+router.delete('/comments', checkJwt, auth.checkUserRole, async (req, res) => {
     const commentId = Number(req.query.id)
-
-    const accessToken = req.headers.authorization.split(" ")[1]
-
-    const userData = await axios.get(`https://${authConfig.domain}/userinfo`, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-    })
 
     comments.sort((a, b) => a.commentId - b.commentId);
 
     for (const index in comments) {
         if (comments[index].commentId === commentId) {
-            if (comments[index].email !== userData.data.email) {
+            if (comments[index].email !== req.email) {
                 res.status(403).json({ error: "You can not delete others comments" })
                 return
             }
@@ -135,7 +122,7 @@ router.delete('/comments', checkJwt, checkUserPermissions, async (req, res) => {
 })
 
 // Admin can delete any comment
-router.delete('/comments/any', checkJwt, checkAdminPermissions, (req, res) => {
+router.delete('/comments/any', checkJwt, auth.checkAdminRole, (req, res) => {
     const commentId = Number(req.query.id)
 
     comments.sort((a, b) => a.commentId - b.commentId);
@@ -150,7 +137,7 @@ router.delete('/comments/any', checkJwt, checkAdminPermissions, (req, res) => {
     res.json(comments)
 })
 
-router.post('/results', checkJwt, checkAdminPermissions, (req, res) => {
+router.post('/results', checkJwt, auth.checkAdminRole, (req, res) => {
     const newResult = req.body
 
     if (newResult.firstTeamId != null
@@ -172,7 +159,7 @@ router.post('/results', checkJwt, checkAdminPermissions, (req, res) => {
 })
 
 
-router.put('/results', checkJwt, checkAdminPermissions, (req, res) => {
+router.put('/results', checkJwt, auth.checkAdminRole, (req, res) => {
     const editedResult = req.body
 
     // Test it with email that acctually made comment also add this to delete
